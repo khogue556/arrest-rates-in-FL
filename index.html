@@ -16,13 +16,12 @@
             background: whitesmoke;
             font-family: Lato, sans-serif;
             color: #0D0000;
-
         }
-
+        
         header {
             padding: 6px 10%;
         }
-
+        
         h1 {
             position: absolute;
             z-index: 650;
@@ -35,39 +34,39 @@
             background: rgba(25, 25, 25, 0.8);
             border-radius: 5px;
         }
-
+        
         h2 {
             display: inline-block;
             color: #001323;
         }
-
+        
         #map {
             position: absolute;
             width: 100%;
             top: 0;
             bottom: 0;
         }
-
+        
         footer {
             padding: 6px 10%;
             width: 80%;
         }
-
+        
         p {
             font-size: 1em;
             color: #001323;
         }
-
+        
         .legend {
-            padding: 6px 8px;
+            padding: 10px 8px;
             font-size: 1em;
             background: rgba(75, 75, 75, 0.8);
             color: whitesmoke;
             box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
-            width: 160px;
+            width: 200px;
         }
-
+        
         .legend h3 {
             font-size: 1.1em;
             font-weight: bold;
@@ -75,29 +74,29 @@
             color: whitesmoke;
             margin: 0;
         }
-
+        
         .legend h3 span {
             font-size: 1.3em;
             margin: 0 20px 0 0;
         }
-
+        
         .legend ul {
             list-style-type: none;
             padding: 0;
             margin: 12px 4px 0;
         }
-
+        
         .legend li {
             height: 22px;
         }
-
+        
         .legend span {
             width: 30px;
             height: 20px;
             float: left;
             margin-right: 10px;
         }
-
+        
         #ui-controls {
             width: 176px;
             padding: 8px 25px 8px 15px;
@@ -106,20 +105,20 @@
             border-radius: 5px;
             color: whitesmoke;
         }
-
+        
         #ui-controls .min {
             float: left;
         }
-
+        
         #ui-controls .max {
             float: right;
             margin-right: -15px;
         }
-
+        
         .year-slider {
             width: 100%;
         }
-
+        
         label {
             font-size: 1.1em;
             font-weight: bold;
@@ -162,49 +161,147 @@
         }).addTo(map);
 
         // AJAX request for GeoJSON data
-         $.getJSON("data/counties.json", function (data) {
-             //  set initial style of counties
-             console.log(data)
+        // use PapaParse or queue.js to load CSV
+        $.getJSON("data/counties.json", function (counties) {
+            //  set initial style of counties
+            //  console.log(data)
 
-             // use PapaParse or queue.js to load CSV
+            Papa.parse('data/Arrest-rate-FIPS.csv', {
 
-             // loop through each county in GeoJSON
+                download: true,
+                header: true,
+                complete: function (data) {
 
-                // loop through each CSV row
+                    // data is accessible to us here
+                    //  console.log('data: ', data);
 
-                    // if CSV FIPS == stateFIP + CountyFIP
-                        // join CSV attributes to county
+                    // note that counties is also accessible here!
+                    //  console.log('counties: ', counties);
+                    processData(counties, data);
+
+                }
+            }); // end of Papa.parse()
+            // loop through each county in GeoJSON
+            function processData(counties, data) {
+                for (var county in counties.features) {
+
+                    var props = counties.features[county].properties;
+
+                    for (var d in data.data) {
+                        if (props.GEOID == data.data[d].FIPS) {
 
 
-            // console.log(data)
+                            counties.features[county].properties = data.data[d];
+                            break;
+                        }
+                          //  console.log('county fip: ', props.COUNTYFP);
+                          //  console.log('data fip: ', data.data[d].FIPS);
 
-            drawMap(data); // call to new function here gets the data out of the
-            // callback function
+                    } // end inner loop
+
+                } //  end outer loop
+                //  console.log('after: ', counties);
+
+
+                var rates = [];
+
+                counties.features.map(function (county) {
+
+                    for (var prop in county.properties) {
+
+                        if ($.isNumeric(county.properties[prop]) && prop != 'COUNTY_FIP' && prop != 'STATE_FIP') {
+
+                            rates.push(Number(county.properties[prop]));
+                        }
+                    }
+                }); // end loop
+
+                // verify the result!
+                //  console.log(rates);
+                var breaks = chroma.limits(rates, 'q', 5);
+
+
+                var colorize = chroma.scale(chroma.brewer.Blues).classes(breaks).mode('lab');
+
+                //  console.log(colorize)
+                
+                drawMap(counties, colorize);
+                drawLegend(breaks, colorize)
+            } //  end processData function
 
         });
 
-        function drawMap(data){
+        function drawMap(counties, colorize) {
 
+            // create Leaflet object with geometry data and add to map
+            var dataLayer = L.geoJson(counties, {
+                style: function (feature) {
+                    return {
+                        color: 'black',
+                        weight: 1,
+                        fillOpacity: 1,
+                        fillColor: '#1f78b4'
+                    };
 
-           var dataLayer = L.geoJson(data, {
-               style: function (feature) {
-                   return {
-                       color: '#dddddd',
-                       weight: 1,
-                       fillOpacity: 1,
-                       fillColor: '#1f78b4'
-                   };
+                }
+            }).addTo(map);
 
-               }
-           }).addTo(map);
+            // first set the zoom/center to the dataLayer's extent
+             map.fitBounds(dataLayer.getBounds());
 
+            // then back the zoom level off a bit (since we're viewing the map full screen)
+            //  map.setZoom(map.getZoom() - .2);
+            createSliderUI(dataLayer, colorize);
+            updateMap(dataLayer, colorize, '2006');
+            // drawInfo();
 
-        }
+        } //  end drawMap
 
+        function updateMap(dataLayer, colorize, currentYear) {
 
+            dataLayer.eachLayer(function (layer) {
 
+                var props = layer.feature.properties;
 
-        /*function createSliderUI(dataLayer, colorize) {
+                layer.setStyle({
+                    fillColor: colorize(Number(props[currentYear]))
+                })
+            })
+
+        };
+        
+        function drawLegend(breaks, colorize) {
+            var legendControl = L.control({
+                position: 'bottomleft'
+            });
+
+            legendControl.onAdd = function (map) {
+
+                var legend = L.DomUtil.create('div', 'legend');
+                return legend;
+
+            };
+
+            legendControl.addTo(map);
+
+            var legend = $('.legend').html("<h3><span>2006</span> Arrest Rates per 100,00 People</h3><ul>");
+
+            for (var i = 0; i < breaks.length - 1; i++) {
+
+                var color = colorize(breaks[i], breaks);
+
+                var classRange = '<li><span style="background:' + color + '"></span> ' +
+                    breaks[i].toLocaleString() + ' &mdash; ' +
+                    breaks[i + 1].toLocaleString() + '</li>'
+
+                $('.legend ul').append(classRange);
+            }
+
+            legend.append("</ul>");
+
+        }  // end draw legend
+
+         function createSliderUI(dataLayer, colorize) {
             var sliderControl = L.control({
                 position: 'bottomleft'
             });
@@ -227,7 +324,39 @@
                 });
             sliderControl.addTo(map);
 
-        } // end createSliderUI()*/
+        } // end createSliderUI()
+
+            /*function drawInfo() {
+            //  draws info box, places in top right of page
+            var info = L.control({
+                position: 'topright'
+            });
+
+            info.onAdd = function (map) {
+
+                var div = L.DomUtil.create('div', 'info');
+
+                return div;
+
+            }
+            info.addTo(map);
+            $(".info").hide();
+        } // end drawInfo*/
+
+        /*function updateInfo(layer) {
+            //  adds content to info box, and updates it with new county info 
+            var props = layer.feature.properties;
+
+            var html = "<h3>" + props['NAME'] + " County</h3>" +
+                /*"total # vacant units: <b>" + props["VACANT"] + "</b><br>" +
+                "# vacant units for rent: <b>" + props["VACANT_FOR"] + "</b><br>" +
+                "# vacant units for sale only: <b>" + props["VACANT_FO2"] + "</b><br>" +
+                "# vacant units rented but not occupied: <b>" + props["VACANT_REN"] + "</b>"
+
+            $(".info").html(html);
+        } // end updateInfo*/
+
+        
     </script>
 
 </body>
