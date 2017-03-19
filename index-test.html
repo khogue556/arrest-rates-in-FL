@@ -162,8 +162,9 @@
         }).addTo(map);
 
         // AJAX request for GeoJSON data
-         $.getJSON("Arrest-rate_FIPS.csv", function (data) {
+         $.getJSON("Arrest-rate-FIPS.csv", function (data) {
 //  set initial style of counties
+             console.log(data)
             var dataLayer = L.geoJson(data, {
                 style: function (feature) {
                     return {
