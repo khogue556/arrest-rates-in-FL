@@ -162,9 +162,9 @@
         }).addTo(map);
 
         // AJAX request for GeoJSON data
-         $.getJSON("Arrest-rate-FIPS.csv", function (data) {
+         $.getJSON("data/Arrest-rate-FIPS.csv", function (data) {
 //  set initial style of counties
-             console.log(data)
+            console.log(data)
             var dataLayer = L.geoJson(data, {
                 style: function (feature) {
                     return {
@@ -184,7 +184,109 @@
             // callback function
 
         });
-        
+        function drawMap(dataLayer) {
+//  function showing breaks on map and add the popup
+            var breaks = getClassBreaks(dataLayer);
+
+            dataLayer.eachLayer(function (layer) {
+                layer.setStyle({
+                    fillColor: getColor(layer.feature.properties[attributeValue] / layer.feature.properties[normValue], breaks),
+                });
+
+                var Name = layer.feature.properties['NAME']
+                
+                var number = ((layer.feature.properties[attributeValue] / layer.feature.properties[normValue] * (100).toLocaleString())).toFixed(2) + ' % '
+                
+                var content = '<b>' + Name + ' County<br></b>' + ' Owned Homes with no Mortgage<br> ' + number;
+
+
+                layer.bindPopup(content) //  .openPopup();
+                                        // using the openPopup(); here will open the popup with the map
+                                        //  without it, click to open popup    
+                
+            });
+            drawLegend(breaks);
+        };
+
+        function drawLegend(breaks) {
+
+            // create a new Leaflet control object, and position it top left
+            var legend = L.control({
+                position: 'topleft'
+            });
+
+            // when the legend is added to the map
+            legend.onAdd = function () {
+
+                // create a new HTML <div> element and give it a class name of "legend"
+                var div = L.DomUtil.create('div', 'legend');
+
+                // first append an <h3> tag to the div holding the current attribute
+                // and norm values (i.e., the mapped phenomena)
+                div.innerHTML = "<h3>" + "Free and Clear" + " PER " + "All Owned Homes" + "</h3>";
+
+                // for each of our breaks
+                for (var i = 0; i < breaks.length; i++) {
+                    // determine the color associated with each break value,
+                    // including the lower range value
+                    var color = getColor(breaks[i][0], breaks);
+
+                    // concatenate a <span> tag styled with the color and the range values
+                    // of that class and include a label with the low and a high ends of that class range
+                    div.innerHTML +=
+                        '<span style="background:' + color + '"></span> ' +
+                        '<label>' + (breaks[i][0] * 100).toLocaleString() + '%' + ' &mdash; ' +
+                        (breaks[i][1] * 100).toLocaleString() + '%' + '</label>';
+                }
+
+                // return the populated div to be added to the map
+                return div;
+
+            };
+
+            // add the legend to the map
+            legend.addTo(map);
+
+        };
+
+        function getClassBreaks(dataLayer) {
+//  set class breaks
+            var values = [];
+
+            dataLayer.eachLayer(function (layer) {
+
+
+                var value = layer.feature.properties[attributeValue] / layer.feature.properties[normValue];
+                values.push(value)
+
+            });
+//  connect to 
+            var cluster = ss.ckmeans(values, 5);
+
+            var breaks = cluster.map(function (cluster) {
+                return [cluster[0], cluster.pop()];
+            });
+
+            return breaks;
+
+        }
+
+        function getColor(d, breaks) {
+
+            if (d <= breaks[0][1]) {
+                return '#f1eef6';
+            } else if (d <= breaks[1][1]) {
+                return '#bdc9e1';
+            } else if (d <= breaks[2][1]) {
+                return '#74a9cf';
+            } else if (d <= breaks[3][1]) {
+                return '#2b8cbe'
+            } else if (d <= breaks[4][1]) {
+                return '#045a8d'
+            }
+
+        }
+    
         
         
         
