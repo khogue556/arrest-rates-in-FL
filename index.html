@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Florida Arrest Rates 1998-2015</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+
+        }
+
+        header {
+            padding: 6px 10%;
+        }
+
+        h1 {
+            position: absolute;
+            z-index: 650;
+            top: 10px;
+            left: 15px;
+            padding: 8px 15px;
+            margin: 0;
+            color: whitesmoke;
+            font-size: 1.5em;
+            background: rgba(25, 25, 25, 0.8);
+            border-radius: 5px;
+        }
+
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+
+        #map {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            bottom: 0;
+        }
+
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+
+        .legend {
+            padding: 6px 8px;
+            font-size: 1em;
+            background: rgba(75, 75, 75, 0.8);
+            color: whitesmoke;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            width: 160px;
+        }
+
+        .legend h3 {
+            font-size: 1.1em;
+            font-weight: bold;
+            line-height: 1em;
+            color: whitesmoke;
+            margin: 0;
+        }
+
+        .legend h3 span {
+            font-size: 1.3em;
+            margin: 0 20px 0 0;
+        }
+
+        .legend ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 12px 4px 0;
+        }
+
+        .legend li {
+            height: 22px;
+        }
+
+        .legend span {
+            width: 30px;
+            height: 20px;
+            float: left;
+            margin-right: 10px;
+        }
+
+        #ui-controls {
+            width: 176px;
+            padding: 8px 25px 8px 15px;
+            background: rgba(75, 75, 75, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            color: whitesmoke;
+        }
+
+        #ui-controls .min {
+            float: left;
+        }
+
+        #ui-controls .max {
+            float: right;
+            margin-right: -15px;
+        }
+
+        .year-slider {
+            width: 100%;
+        }
+
+        label {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Florida Arrest Rates: 1998 &ndash; 2015</h1>
+    <div id="map"></div>
+    <div id="ui-controls">
+        <label><span class="min">1998</span><span class="max">2015</span>
+            <input type="range" min="1998" , max="2015" , value="1998" , step="1" , class="year-slider">
+        </label>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
+
+    <script>
+        // map options
+        var options = {
+            center: [28, -84.3],
+            zoom: 6.5,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            dragging: false
+        }
+
+        // create the Leaflet map
+        var map = L.map('map', options);
+
+        // request tiles and add to map
+        var tiles = L.tileLayer('http://{s}.tile.stamen.com/toner-background/{z}/{x}/{y}.{ext}', {
+            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            subdomains: 'abcd',
+            ext: 'png'
+        }).addTo(map);
+
+        // AJAX request for GeoJSON data
+         $.getJSON("data/counties.json", function (data) {
+             //  set initial style of counties
+             console.log(data)
+
+             // use PapaParse or queue.js to load CSV
+
+             // loop through each county in GeoJSON
+
+                // loop through each CSV row
+
+                    // if CSV FIPS == stateFIP + CountyFIP
+                        // join CSV attributes to county
+
+
+            // console.log(data)
+
+            drawMap(data); // call to new function here gets the data out of the
+            // callback function
+
+        });
+
+        function drawMap(data){
+
+
+           var dataLayer = L.geoJson(data, {
+               style: function (feature) {
+                   return {
+                       color: '#dddddd',
+                       weight: 1,
+                       fillOpacity: 1,
+                       fillColor: '#1f78b4'
+                   };
+
+               }
+           }).addTo(map);
+
+
+        }
+
+
+
+
+        /*function createSliderUI(dataLayer, colorize) {
+            var sliderControl = L.control({
+                position: 'bottomleft'
+            });
+
+            sliderControl.onAdd = function (map) {
+
+                var slider = L.DomUtil.get("ui-controls");
+
+                L.DomEvent.disableScrollPropagation(slider);
+
+                L.DomEvent.disableClickPropagation(slider);
+
+                return slider;
+            }
+            $(".year-slider")
+                .on("input change", function () {
+                    var currentYear = $(this).val();
+                    updateMap(dataLayer, colorize, currentYear);
+                    $('.legend h3 span').html(currentYear);
+                });
+            sliderControl.addTo(map);
+
+        } // end createSliderUI()*/
+    </script>
+
+</body>
+
+</html>
