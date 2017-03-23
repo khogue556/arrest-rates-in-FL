@@ -36,16 +36,6 @@
         }
         
         h2 {
-            /*position: absolute;
-            z-index: 650;
-            top: 10px;
-            left: 15px;
-            padding: 8px 15px;
-            margin: 0;
-            color: whitesmoke;
-            font-size: 1.5em;
-            background: rgba(25, 25, 25, 0.8);
-            border-radius: 5px;*/
             display: inline-block;
             color: #001323;
         }
@@ -147,17 +137,12 @@
 
 <body>
     <h1>Florida Arrest Rates: 1998 &ndash; 2015</h1>
-    <p>Map by Kevin Hogue</p>
     <div id="map"></div>
     <div id="ui-controls">
         <label><span class="min">1998</span><span class="max">2015</span>
             <input type="range" min="1998" , max="2015" , value="1998" , step="1" , class="year-slider">
         </label>
     </div>
-    <div id="meta"> 
-        <h3>Map by Kevin Hogue </h3>
-         </div>
-    
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
@@ -165,8 +150,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
 
     <script>
-        
-        
         // map options
         var options = {
             center: [28, -84.3],
@@ -253,7 +236,7 @@
 
                 drawMap(counties, colorize);
                 drawLegend(breaks, colorize);
-                drawinfo()
+                //  drawinfo()
             } //  end processData function
 
         });
@@ -262,6 +245,7 @@
 
             // create Leaflet object with geometry data and add to map
             var dataLayer = L.geoJson(counties, {
+                
                 style: function (feature) {
                     return {
                         color: 'black',
@@ -271,6 +255,7 @@
                     };
                     
                     map.fitBounds(dataLayer.getBounds());
+                    
                 }
             }).addTo(map);
 
@@ -354,10 +339,10 @@
 
         } // end createSliderUI()
 
-        function drawInfo() {
+       /* function drawInfo() {
             //  draws info box, places in top right of page
             var info = L.control({
-                position: 'bottomleft'
+                position: 'topright'
             });
 
             info.onAdd = function (map) {
@@ -369,9 +354,9 @@
             }
             info.addTo(map);
             $(".info").hide();
-        } // end drawInfo
+        } // end drawInfo*/
 
-        function updateInfo(layer) {
+        /*function updateInfo(layer) {
             //  adds content to info box, and updates it with new county info 
             var props = layer.feature.properties;
 
@@ -379,7 +364,29 @@
                 
 
             $(".info").html(html);
-        } // end updateInfo
+        } // end updateInfo*/
+        
+        
+        var stateAverage = {
+            "1998": 5458.2,
+            "1999": 5458.2, 
+            "2000": 5458.2, 
+            "2001": 5458.2,
+            "2002": 5458.2,
+            "2003": 5458.2,
+            "2004": 5458.2,
+            "2005": 5458.2,
+            "2006": 5458.2,
+            "2007": 5458.2,
+            "2008": 5458.2,
+            "2009": 5458.2,
+            "2010": 5458.2,
+            "2011": 5458.2,
+            "2012": 5458.2,
+            "2013": 5458.2,
+            "2014": 5458.2,
+            "2015": 5458.2,
+     }
     </script>
 
 </body>
