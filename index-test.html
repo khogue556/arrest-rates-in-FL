@@ -253,7 +253,17 @@
                         fillOpacity: 1,
                         fillColor: '#1f78b4'
                     };
+                    var Name = layer.feature.properties
                     
+                
+                var number = (layer.feature.properties)  + ' % '
+                
+                var content = '<b>' + Name + ' County<br></b>' + ' Owned Homes with no Mortgage<br> ' + number;
+
+
+                layer.bindPopup(content) //  .openPopup();
+                                        // using the openPopup(); here will open the popup with the map
+                                        //  without it, click to open popup 
                     map.fitBounds(dataLayer.getBounds());
                     
                 }
