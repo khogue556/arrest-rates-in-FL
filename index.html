@@ -15,51 +15,51 @@
             padding: 0;
             background: whitesmoke;
             font-family: Lato, sans-serif;
-            color: #0D0000;
+            color: #0080ff;
         }
-
+        
         header {
             padding: 6px 10%;
         }
-
+        
         h1 {
             position: absolute;
             z-index: 650;
-            top: 125px;
-            left: 15px;
+            top: 80px;
+            left: 10px;
             padding: 8px 15px;
             margin: 0;
             color: whitesmoke;
             font-size: 1.5em;
-            background: rgba(25, 25, 25, 0.8);
+            background: rgba(75, 75, 75, 0.8);
             border-radius: 5px;
         }
-
+        
         h2 {
             position: absolute;
             z-index: 650;
-            top: 180px;
+            top: 130px;
             left: 10px;
             padding: 8px 15px;
             margin: 0;
             color: whitesmoke;
             font-size: 1.3em;
-            background: rgba(25, 25, 25, 0.8);
+            background: rgba(75, 75, 75, 0.8);
             border-radius: 5px;
         }
-
+        
         #map {
             position: absolute;
             width: 100%;
             top: 0;
             bottom: 0;
         }
-
+        
         footer {
             padding: 6px 10%;
             width: 80%;
         }
-
+        
         p {
             position: absolute;
             z-index: 650;
@@ -69,15 +69,15 @@
             margin: 0;
             color: whitesmoke;
             font-size: .9em;
-            background: rgba(25, 25, 25, 0.8);
+            background: rgba(75, 75, 75, 0.8);
             border-radius: 5px;
         }
         .leaflet-tooltip {
             color: whitesmoke;
             font-size: .9em;
-            background: rgba(25, 25, 25, 0.8);
+            background: rgba(75, 75, 75, 0.8);
         }
-
+        
         .legend {
             padding: 10px 8px;
             font-size: 1em;
@@ -87,7 +87,7 @@
             border-radius: 5px;
             width: 200px;
         }
-
+        
         .legend h3 {
             font-size: 1.1em;
             font-weight: bold;
@@ -95,29 +95,29 @@
             color: whitesmoke;
             margin: 0;
         }
-
+        
         .legend h3 span {
             font-size: 1.3em;
             margin: 0 20px 0 0;
         }
-
+        
         .legend ul {
             list-style-type: none;
             padding: 0;
             margin: 12px 4px 0;
         }
-
+        
         .legend li {
             height: 22px;
         }
-
+        
         .legend span {
             width: 30px;
             height: 20px;
             float: left;
             margin-right: 10px;
         }
-
+        
         #ui-controls {
             width: 176px;
             padding: 8px 25px 8px 15px;
@@ -126,39 +126,27 @@
             border-radius: 5px;
             color: whitesmoke;
         }
-
+        
         #ui-controls .min {
             float: left;
         }
-
+        
         #ui-controls .max {
             float: right;
             margin-right: -15px;
         }
-
+        
         .year-slider {
             width: 100%;
         }
-
-        label {
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-
-        .info {
-            padding: 6px 8px;
-            font-size: 1em;
-            background: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            text-align: right;
-        }
+        
+      
     </style>
 </head>
 
 <body>
     <h1>Florida Arrest Rates: 1998 &ndash; 2015</h1>
-    <h2>Percent increase or decrease in arrest rates<br> for each county in Florida compared <br> against the state average from 1998-2015</h2>
+    <h2>Arrest rates per 100,000 residents.<br>Hover over each county to see <br> its yearly arrest rate and how it <br> compares to the state average<br> of 5,458 arrest per 100,000.</h2>
     <p>Data: <a href="http://www.fdle.state.fl.us/cms/FSAC/Data-Statistics/UCR-Arrest-Data.aspx">Florida Department of Law Enforcement</a><br> Map by Kevin Hogue<br> New Maps Plus - Spring 2017</p>
     <div id="map"></div>
     <div id="ui-controls">
@@ -166,6 +154,7 @@
             <input type="range" min="1998" , max="2015" , value="1998" , step="1" , class="year-slider">
         </label>
     </div>
+      
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
@@ -173,6 +162,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
 
     <script>
+        
+        
         // map options
         var options = {
             center: [28, -84.3],
@@ -226,7 +217,6 @@
                             counties.features[county].properties = data.data[d];
                             break;
                         }
-
                         //  console.log('county fip: ', props.COUNTYFP);
                         //  console.log('data fip: ', data.data[d].FIPS);
 
@@ -241,9 +231,10 @@
                 counties.features.map(function (county) {
 
                     for (var prop in county.properties) {
-                        console.log(prop, county.properties[prop])
+
                         if ($.isNumeric(county.properties[prop]) && prop != 'FIPS' && prop != 'State') {
-                            rates.push(county.properties[prop]/county.properties.State);
+
+                            rates.push(Number(county.properties[prop]));
                         }
                     }
                 }); // end loop
@@ -251,15 +242,15 @@
                 // verify the result!
                 //  console.log(rates);
                 var breaks = chroma.limits(rates, 'q', 5);
-                console.log(breaks)
 
-                var colorize = chroma.scale(chroma.brewer.RdBu).classes(breaks).mode('lab');
+
+                var colorize = chroma.scale(chroma.brewer.Reds).classes(breaks).mode('lab');
 
                 //  console.log(colorize)
 
                 drawMap(counties, colorize);
                 drawLegend(breaks, colorize);
-                //  drawinfo()
+                
             } //  end processData function
 
         });
@@ -268,28 +259,21 @@
 
             // create Leaflet object with geometry data and add to map
             var dataLayer = L.geoJson(counties, {
-
                 style: function (feature) {
                     return {
                         color: 'black',
                         weight: 1,
-                        fillOpacity: 1
+                        fillOpacity: 1,
+                        fillColor: '#1f78b4'
                     };
-
+                    
                     map.fitBounds(dataLayer.getBounds());
-
                 }
             }).addTo(map);
 
-            // first set the zoom/center to the dataLayer's extent
-            //  map.fitBounds(dataLayer.getBounds());
-
-            // then back the zoom level off a bit (since we're viewing the map full screen)
-            //  map.setZoom(map.getZoom() - .2);
             createSliderUI(dataLayer, colorize);
-            updateMap(dataLayer, colorize, '2006');
-            // drawInfo();
-
+            updateMap(dataLayer, colorize, '1998');
+           
         } //  end drawMap
 
         function updateMap(dataLayer, colorize, currentYear, stateAverage) {
@@ -301,12 +285,12 @@
                 var rateDifference = props[currentYear]/props.State;
 
                 layer.setStyle({
-                    fillColor: colorize(rateDifference)
+                    fillColor: colorize(Number(props[currentYear]))
                 });
 
                 var tooltip = "<b>" + props.County + "</b><br />" +
                               "County rate per 100k people: " + props[currentYear] + "<br />" +
-                              "Percent difference from <br> state average: " + Number(props[currentYear]/props.State).toLocaleString() + "%";
+                              props.County + "'s arrest rate is " + Number((props[currentYear]/props.State)*100).toFixed(2).toLocaleString() + "% <br /> of the statewide average";
 
                 layer.bindTooltip(tooltip);
 
@@ -328,15 +312,15 @@
 
             legendControl.addTo(map);
 
-            var legend = $('.legend').html("<h3><span>2006</span> Percent Change from State Average</h3><ul>");
+            var legend = $('.legend').html("<h3><span>1998</span> Arrest Rates per 100,00 People</h3><ul>");
 
             for (var i = 0; i < breaks.length - 1; i++) {
 
                 var color = colorize(breaks[i], breaks);
 
                 var classRange = '<li><span style="background:' + color + '"></span> ' +
-                    breaks[i].toFixed(2).toLocaleString() + '% &mdash; ' +
-                    breaks[i + 1].toFixed(2).toLocaleString() + '% </li>'
+                    breaks[i].toFixed(0).toLocaleString() + ' &mdash; ' +
+                    breaks[i + 1].toFixed(0).toLocaleString() + '</li>'
 
                 $('.legend ul').append(classRange);
             }
@@ -370,9 +354,32 @@
 
         } // end createSliderUI()
 
+        /*function drawInfo() {
+            //  draws info box, places in top right of page
+            var info = L.control({
+                position: 'bottomleft'
+            });
 
+            info.onAdd = function (map) {
 
+                var div = L.DomUtil.create('div', 'info');
 
+                return div;
+
+            }
+            info.addTo(map);
+            $(".info").hide();
+        } // end drawInfo
+
+        function updateInfo(layer) {
+            //  adds content to info box, and updates it with new county info 
+            var props = layer.feature.properties;
+
+            var html = "<h3>" + props['NAME'] + " County</h3>"
+                
+
+            $(".info").html(html);
+        } // end updateInfo*/
     </script>
 
 </body>
