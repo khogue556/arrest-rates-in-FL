@@ -243,7 +243,7 @@
                     for (var prop in county.properties) {
                         console.log(prop, county.properties[prop])
                         if ($.isNumeric(county.properties[prop]) && prop != 'FIPS' && prop != 'State') {
-                            rates.push(Number(county.properties[prop]));
+                            rates.push(county.properties[prop]/county.properties.State);
                         }
                     }
                 }); // end loop
@@ -251,7 +251,7 @@
                 // verify the result!
                 //  console.log(rates);
                 var breaks = chroma.limits(rates, 'q', 5);
-            
+                console.log(breaks)
 
                 var colorize = chroma.scale(chroma.brewer.RdBu).classes(breaks).mode('lab');
 
@@ -297,15 +297,16 @@
             dataLayer.eachLayer(function (layer) {
 
                 var props = layer.feature.properties;
-                
-                var rateDifference = props[currentYear] / props[stateAverage];
-                
+
+                var rateDifference = props[currentYear]/props.State;
+
                 layer.setStyle({
-                    fillColor: colorize(Number(rateDifference))
+                    fillColor: colorize(rateDifference)
                 });
 
                 var tooltip = "<b>" + props.County + "</b><br />" +
-                              "Percent change from <br> state average: " + props[currentYear] + "%";
+                              "County rate per 100k people: " + props[currentYear] + "<br />" +
+                              "Percent difference from <br> state average: " + Number(props[currentYear]/props.State).toLocaleString() + "%";
 
                 layer.bindTooltip(tooltip);
 
