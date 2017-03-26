@@ -246,7 +246,7 @@
                 // verify the result!
                 //  console.log(rates);
                 var breaks = chroma.limits(rates, 'q', 5);
-
+            
 
                 var colorize = chroma.scale(chroma.brewer.RdBu).classes(breaks).mode('lab');
 
@@ -268,8 +268,7 @@
                     return {
                         color: 'black',
                         weight: 1,
-                        fillOpacity: 1,
-                        fillColor: '#1f78b4'
+                        fillOpacity: 1
                     };
 
                     map.fitBounds(dataLayer.getBounds());
@@ -296,7 +295,13 @@
 
                 layer.setStyle({
                     fillColor: colorize(Number(props[currentYear]))
-                })
+                });
+
+                var tooltip = "<b>" + props.County + "</b><br />" +
+                              "Percent different: " + props[currentYear] + "%";
+
+                layer.bindTooltip(tooltip);
+
             })
 
         };
