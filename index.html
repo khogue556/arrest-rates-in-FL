@@ -74,7 +74,7 @@
         }
         .leaflet-tooltip {
             color: whitesmoke;
-            font-size: .9em;
+            font-size: 1.3em;
             background: rgba(75, 75, 75, 0.8);
         }
         
@@ -147,7 +147,7 @@
 <body>
     <h1>Florida Arrest Rates: 1998 &ndash; 2015</h1>
     <h2>Arrest rates per 100,000 residents.<br>Hover over each county to see <br> its yearly arrest rate and how it <br> compares to the state average<br> of 5,458 arrest per 100,000.</h2>
-    <p>Data: <a href="http://www.fdle.state.fl.us/cms/FSAC/Data-Statistics/UCR-Arrest-Data.aspx">Florida Department of Law Enforcement</a><br> Map by Kevin Hogue<br> New Maps Plus - Spring 2017</p>
+    <p><a href="http://www.fdle.state.fl.us/cms/FSAC/Data-Statistics/UCR-Arrest-Data.aspx">Data:</a>Florida Department of Law Enforcement<br> Map by Kevin Hogue<br> New Maps Plus - Spring 2017</p>
     <div id="map"></div>
     <div id="ui-controls">
         <label><span class="min">1998</span><span class="max">2015</span>
@@ -289,7 +289,7 @@
                 });
 
                 var tooltip = "<b>" + props.County + "</b><br />" +
-                              "County rate per 100k people: " + props[currentYear] + "<br />" +
+                              "Arrest rate per 100k people: " + props[currentYear] + "<br />" +
                               props.County + "'s arrest rate is " + Number((props[currentYear]/props.State)*100).toFixed(2).toLocaleString() + "% <br /> of the statewide average";
 
                 layer.bindTooltip(tooltip);
