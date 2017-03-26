@@ -17,11 +17,11 @@
             font-family: Lato, sans-serif;
             color: #0D0000;
         }
-        
+
         header {
             padding: 6px 10%;
         }
-        
+
         h1 {
             position: absolute;
             z-index: 650;
@@ -34,7 +34,7 @@
             background: rgba(25, 25, 25, 0.8);
             border-radius: 5px;
         }
-        
+
         h2 {
             position: absolute;
             z-index: 650;
@@ -47,19 +47,19 @@
             background: rgba(25, 25, 25, 0.8);
             border-radius: 5px;
         }
-        
+
         #map {
             position: absolute;
             width: 100%;
             top: 0;
             bottom: 0;
         }
-        
+
         footer {
             padding: 6px 10%;
             width: 80%;
         }
-        
+
         p {
             position: absolute;
             z-index: 650;
@@ -72,7 +72,7 @@
             background: rgba(25, 25, 25, 0.8);
             border-radius: 5px;
         }
-        
+
         .legend {
             padding: 10px 8px;
             font-size: 1em;
@@ -82,7 +82,7 @@
             border-radius: 5px;
             width: 200px;
         }
-        
+
         .legend h3 {
             font-size: 1.1em;
             font-weight: bold;
@@ -90,29 +90,29 @@
             color: whitesmoke;
             margin: 0;
         }
-        
+
         .legend h3 span {
             font-size: 1.3em;
             margin: 0 20px 0 0;
         }
-        
+
         .legend ul {
             list-style-type: none;
             padding: 0;
             margin: 12px 4px 0;
         }
-        
+
         .legend li {
             height: 22px;
         }
-        
+
         .legend span {
             width: 30px;
             height: 20px;
             float: left;
             margin-right: 10px;
         }
-        
+
         #ui-controls {
             width: 176px;
             padding: 8px 25px 8px 15px;
@@ -121,25 +121,25 @@
             border-radius: 5px;
             color: whitesmoke;
         }
-        
+
         #ui-controls .min {
             float: left;
         }
-        
+
         #ui-controls .max {
             float: right;
             margin-right: -15px;
         }
-        
+
         .year-slider {
             width: 100%;
         }
-        
+
         label {
             font-size: 1.1em;
             font-weight: bold;
         }
-        
+
         .info {
             padding: 6px 8px;
             font-size: 1em;
@@ -213,15 +213,15 @@
                 for (var county in counties.features) {
 
                     var props = counties.features[county].properties;
-  
+
                     for (var d in data.data) {
                         if (props.GEOID == data.data[d].FIPS) {
 
 
                             counties.features[county].properties = data.data[d];
                             break;
-                        } 
-                      
+                        }
+
                         //  console.log('county fip: ', props.COUNTYFP);
                         //  console.log('data fip: ', data.data[d].FIPS);
 
@@ -236,9 +236,8 @@
                 counties.features.map(function (county) {
 
                     for (var prop in county.properties) {
-
-                        if ($.isNumeric(county.properties[prop]) && prop != 'COUNTY_FIP' && prop != 'STATE_FIP' && prop != 'GEOID') {
-
+                        console.log(prop, county.properties[prop])
+                        if ($.isNumeric(county.properties[prop]) && prop != 'FIPS') {
                             rates.push(Number(county.properties[prop]));
                         }
                     }
@@ -264,7 +263,7 @@
 
             // create Leaflet object with geometry data and add to map
             var dataLayer = L.geoJson(counties, {
-                
+
                 style: function (feature) {
                     return {
                         color: 'black',
@@ -272,9 +271,9 @@
                         fillOpacity: 1,
                         fillColor: '#1f78b4'
                     };
-                    
+
                     map.fitBounds(dataLayer.getBounds());
-                    
+
                 }
             }).addTo(map);
 
@@ -376,17 +375,17 @@
         } // end drawInfo*/
 
         /*function updateInfo(layer) {
-            //  adds content to info box, and updates it with new county info 
+            //  adds content to info box, and updates it with new county info
             var props = layer.feature.properties;
 
             var html = "<h3>" + props['NAME'] + " County</h3>"
-                
+
 
             $(".info").html(html);
         } // end updateInfo*/
-        
-        
-        
+
+
+
     </script>
 
 </body>
