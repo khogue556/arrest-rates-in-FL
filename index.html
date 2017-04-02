@@ -15,7 +15,7 @@
             padding: 0;
             background: whitesmoke;
             font-family: Lato, sans-serif;
-            color: #0080ff;
+            color: #fdfdfd;
         }
         
         header {
@@ -25,26 +25,26 @@
         h1 {
             position: absolute;
             z-index: 650;
-            top: 80px;
-            left: 10px;
+            bottom: 330px;
+            left: 60px;
             padding: 8px 15px;
             margin: 0;
             color: whitesmoke;
             font-size: 1.5em;
-            background: rgba(75, 75, 75, 0.8);
+            background: rgba(75, 75, 75, 1);
             border-radius: 5px;
         }
         
         h2 {
             position: absolute;
             z-index: 650;
-            top: 130px;
-            left: 10px;
+            bottom: 180px;
+            left: 60px;
             padding: 8px 15px;
             margin: 0;
             color: whitesmoke;
             font-size: 1.3em;
-            background: rgba(75, 75, 75, 0.8);
+            background: rgba(75, 75, 75, 1);
             border-radius: 5px;
         }
         
@@ -63,27 +63,27 @@
         p {
             position: absolute;
             z-index: 650;
-            bottom: 260px;
-            left: 10px;
+            bottom: 100px;
+            left: 60px;
             padding: 8px 15px;
             margin: 0;
             color: whitesmoke;
             font-size: .9em;
-            background: rgba(75, 75, 75, 0.8);
+            background: rgba(75, 75, 75, 1);
             border-radius: 5px;
         }
         .leaflet-tooltip {
-            color: whitesmoke;
+            color: #ffffff;
             font-size: 1.3em;
-            background: rgba(75, 75, 75, 0.8);
+            background: rgba(10, 10, 10, 1);
         }
         
         .legend {
             padding: 10px 8px;
             font-size: 1em;
-            background: rgba(75, 75, 75, 0.8);
+            background: rgba(75, 75, 75, 1);
             color: whitesmoke;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 1);
             border-radius: 5px;
             width: 200px;
         }
@@ -121,8 +121,8 @@
         #ui-controls {
             width: 176px;
             padding: 8px 25px 8px 15px;
-            background: rgba(75, 75, 75, 0.8);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            background: rgba(75, 75, 75, 1);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 1);
             border-radius: 5px;
             color: whitesmoke;
         }
@@ -145,8 +145,8 @@
 </head>
 
 <body>
-    <h1>Florida Arrest Rates: 1998 &ndash; 2015</h1>
-    <h2>Arrest rates per 100,000 residents.<br>Hover over each county to see <br> its yearly arrest rate and how it <br> compares to the state average<br> of 5,458 arrest per 100,000.</h2>
+    <h1>Law Enforcement in Florida: 1998 &ndash; 2015</h1>
+    <h2>Arrest rates per 100,000 residents.<br>Hover over each county to see <br> the yearly arrest rate and how it <br> compares to the state average<br> of 5,458 arrest per 100,000.</h2>
     <p><a href="http://www.fdle.state.fl.us/cms/FSAC/Data-Statistics/UCR-Arrest-Data.aspx">Data:</a>Florida Department of Law Enforcement<br> Map by Kevin Hogue<br> New Maps Plus - Spring 2017</p>
     <div id="map"></div>
     <div id="ui-controls">
@@ -166,11 +166,11 @@
         
         // map options
         var options = {
-            center: [28, -84.3],
+            center: [28, -83.9],
             zoom: 6.5,
-            zoomControl: false,
-            scrollWheelZoom: false,
-            dragging: false
+            zoomControl: true,
+            scrollWheelZoom: true,
+            dragging: true
         }
 
         // create the Leaflet map
@@ -185,12 +185,12 @@
 
         // AJAX request for GeoJSON data
         // use PapaParse or queue.js to load CSV
+       
         $.getJSON("data/counties.json", function (counties) {
             //  set initial style of counties
             //  console.log(data)
 
             Papa.parse('data/Arrest-rate_FIPS_2.csv', {
-
                 download: true,
                 header: true,
                 complete: function (data) {
@@ -204,6 +204,7 @@
 
                 }
             }); // end of Papa.parse()
+            
             // loop through each county in GeoJSON
             function processData(counties, data) {
                 for (var county in counties.features) {
@@ -258,6 +259,7 @@
         function drawMap(counties, colorize) {
 
             // create Leaflet object with geometry data and add to map
+             
             var dataLayer = L.geoJson(counties, {
                 style: function (feature) {
                     return {
@@ -300,7 +302,7 @@
 
         function drawLegend(breaks, colorize) {
             var legendControl = L.control({
-                position: 'bottomleft'
+                position: 'bottomright'
             });
 
             legendControl.onAdd = function (map) {
@@ -319,8 +321,8 @@
                 var color = colorize(breaks[i], breaks);
 
                 var classRange = '<li><span style="background:' + color + '"></span> ' +
-                    breaks[i].toFixed(0).toLocaleString() + ' &mdash; ' +
-                    breaks[i + 1].toFixed(0).toLocaleString() + '</li>'
+                    breaks[i].toLocaleString() + ' &mdash; ' +
+                    breaks[i + 1].toLocaleString() + '</li>'
 
                 $('.legend ul').append(classRange);
             }
@@ -331,7 +333,7 @@
 
         function createSliderUI(dataLayer, colorize) {
             var sliderControl = L.control({
-                position: 'bottomleft'
+                position: 'bottomright'
             });
 
             sliderControl.onAdd = function (map) {
@@ -354,32 +356,7 @@
 
         } // end createSliderUI()
 
-        /*function drawInfo() {
-            //  draws info box, places in top right of page
-            var info = L.control({
-                position: 'bottomleft'
-            });
-
-            info.onAdd = function (map) {
-
-                var div = L.DomUtil.create('div', 'info');
-
-                return div;
-
-            }
-            info.addTo(map);
-            $(".info").hide();
-        } // end drawInfo
-
-        function updateInfo(layer) {
-            //  adds content to info box, and updates it with new county info 
-            var props = layer.feature.properties;
-
-            var html = "<h3>" + props['NAME'] + " County</h3>"
-                
-
-            $(".info").html(html);
-        } // end updateInfo*/
+        
     </script>
 
 </body>
